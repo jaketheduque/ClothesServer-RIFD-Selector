@@ -59,65 +59,10 @@ String serverIP = "";
 
 MFRC522::StatusCode status;
 
-void WriteDataToBlock(int blockNum, byte blockData[])
-{
-  /* Authenticating the desired data block for write access using Key A */
-  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
-  if (status != MFRC522::STATUS_OK)
-  {
-    Serial.print("Authentication failed for Write: ");
-    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
-    return;
-  }
-  else
-  {
-    Serial.println("Authentication success");
-  }
+void WriteDataToBlock(int blockNum, byte blockData[]);
+void ReadDataFromBlock(int blockNum, byte readBlockData[]);
 
-  /* Write data to the block */
-  status = mfrc522.MIFARE_Write(blockNum, blockData, 16);
-  if (status != MFRC522::STATUS_OK)
-  {
-    Serial.print("Writing to Block failed: ");
-    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
-    return;
-  }
-  else
-  {
-    Serial.println("Data was written into Block successfully");
-  }
-
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
-}
-
-void ReadDataFromBlock(int blockNum, byte readBlockData[])
-{
-  /* Authenticating the desired data block for Read access using Key A */
-  byte status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
-
-  if (status != MFRC522::STATUS_OK)
-  {
-    Serial.print("Authentication failed for Read: ");
-    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
-    return;
-  }
-
-  /* Reading data from the Block */
-  status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
-  if (status != MFRC522::STATUS_OK)
-  {
-    Serial.print("Reading failed: ");
-    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
-    return;
-  }
-
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
-}
-
-void setup()
-{
+void setup() {
   // Set encoder pins as inputs
   pinMode(CLK, INPUT);
   pinMode(DT, INPUT);
@@ -175,8 +120,7 @@ void setup()
   Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
+void loop() {
   /*
    * Rotary encoder section
    */
@@ -404,4 +348,59 @@ void loop()
       currentCardUID = "";
     }
   }
+}
+
+void WriteDataToBlock(int blockNum, byte blockData[]) {
+  /* Authenticating the desired data block for write access using Key A */
+  status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
+  if (status != MFRC522::STATUS_OK)
+  {
+    Serial.print("Authentication failed for Write: ");
+    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
+    return;
+  }
+  else
+  {
+    Serial.println("Authentication success");
+  }
+
+  /* Write data to the block */
+  status = mfrc522.MIFARE_Write(blockNum, blockData, 16);
+  if (status != MFRC522::STATUS_OK)
+  {
+    Serial.print("Writing to Block failed: ");
+    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
+    return;
+  }
+  else
+  {
+    Serial.println("Data was written into Block successfully");
+  }
+
+  mfrc522.PICC_HaltA();
+  mfrc522.PCD_StopCrypto1();
+}
+
+void ReadDataFromBlock(int blockNum, byte readBlockData[]) {
+  /* Authenticating the desired data block for Read access using Key A */
+  byte status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
+
+  if (status != MFRC522::STATUS_OK)
+  {
+    Serial.print("Authentication failed for Read: ");
+    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
+    return;
+  }
+
+  /* Reading data from the Block */
+  status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
+  if (status != MFRC522::STATUS_OK)
+  {
+    Serial.print("Reading failed: ");
+    Serial.println(mfrc522.GetStatusCodeName((MFRC522::StatusCode)status));
+    return;
+  }
+
+  mfrc522.PICC_HaltA();
+  mfrc522.PCD_StopCrypto1();
 }
